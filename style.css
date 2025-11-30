@@ -1,0 +1,67 @@
+:root{
+  --bg:#121212; --panel:#181818; --muted:#b3b3b3; --accent:#1db954; --glass: rgba(255,255,255,0.03);
+  --white:#fff;
+  --max-width:1200px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+*{box-sizing:border-box}
+html,body,#app{height:100%; margin:0; background:linear-gradient(180deg,#0f0f0f,#0b0b0b); color:var(--muted);}
+.app{display:flex;max-width:var(--max-width);margin:16px auto;border-radius:10px;overflow:hidden;box-shadow:0 6px 30px rgba(0,0,0,0.7)}
+.sidebar{width:220px;background:var(--panel);padding:18px;display:flex;flex-direction:column;gap:10px}
+.logo{color:var(--white);font-weight:700;font-size:20px;margin-bottom:8px}
+.sidebar nav{display:flex;flex-direction:column;gap:6px}
+.nav-btn{background:transparent;border:0;color:var(--muted);padding:10px;border-radius:6px;text-align:left;cursor:pointer}
+.nav-btn.active{background:var(--glass);color:var(--white)}
+.sidebar-bottom{margin-top:auto}
+.primary{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:6px;cursor:pointer}
+.link{background:transparent;border:0;color:var(--accent);cursor:pointer}
+.hint{font-size:11px;color:#777}
+
+.main{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.01) 100%);padding:16px;min-height:480px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.search-wrap{flex:1}
+.search-wrap input{width:100%;padding:10px;border-radius:8px;border:0;background:#0f0f0f;color:var(--white)}
+.user-area{display:flex;align-items:center;gap:12px}
+.user-info{display:flex;align-items:center;gap:8px}
+.hidden{display:none}
+.avatar{border-radius:50%;object-fit:cover}
+.avatar.tiny{width:34px;height:34px}
+.avatar.large{width:120px;height:120px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.list{display:flex;flex-direction:column;gap:8px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:10px;border-radius:8px;display:flex;flex-direction:column;gap:8px}
+.card img{width:100%;height:120px;border-radius:6px;object-fit:cover}
+.card .meta{display:flex;justify-content:space-between;align-items:center}
+.card .meta .info{overflow:hidden}
+.card .meta .info .title{color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .meta .info .artist{color:var(--muted);font-size:12px}
+
+.player{position:fixed;left:16px;right:16px;bottom:16px;background:rgba(18,18,18,0.98);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:12px;z-index:50;box-shadow:0 12px 50px rgba(0,0,0,0.6)}
+.player .cover{width:56px;height:56px;border-radius:6px;object-fit:cover}
+.player-left{display:flex;align-items:center;gap:12px;width:240px}
+.player-center{flex:1;display:flex;flex-direction:column;gap:8px}
+.controls{display:flex;gap:10px;justify-content:center}
+.seek{display:flex;align-items:center;gap:8px}
+.seek input[type=range]{width:100%}
+.player-right{display:flex;align-items:center;gap:8px}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:80}
+.modal-content{background:var(--panel);padding:18px;border-radius:10px;width:min(720px,96%);color:var(--muted);position:relative}
+.modal-content h3{margin-top:0;color:var(--white)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+input,textarea,select{width:100%;padding:8px;border-radius:6px;border:0;background:#0d0d0d;color:var(--white);margin-top:6px}
+label{display:block;margin-top:8px;color:var(--muted);font-size:13px}
+
+.close{position:absolute;right:12px;top:10px;background:transparent;border:0;color:var(--muted);font-size:18px;cursor:pointer}
+
+.profile-header{display:flex;gap:16px;align-items:center}
+.profile-actions{display:flex;gap:8px;margin-top:8px}
+.badge{display:inline-block;padding:4px 8px;background:#083f8a;color:#fff;border-radius:20px;font-size:12px}
+.profile .title{font-size:18px;color:var(--white)}
+
+@media (max-width:900px){
+  .app{flex-direction:column;max-width:100%;margin:0;border-radius:0}
+  .sidebar{width:100%;display:flex;flex-direction:row;align-items:center;padding:8px;gap:12px}
+  .main{padding:12px}
+  .player{left:0;right:0;border-radius:0;margin:0 0 0 0}
+}

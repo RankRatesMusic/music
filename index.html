@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MyStream — rebuilt</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Firebase v9 modular SDK (CDN) -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js"></script>
+</head>
+<body>
+  <div id="app" class="app">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">MyStream</div>
+      <nav>
+        <button class="nav-btn active" data-view="home">Home</button>
+        <button class="nav-btn" data-view="search">Search</button>
+        <button class="nav-btn" data-view="library">Library</button>
+        <button class="nav-btn" data-view="playlists">Playlists</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button id="uploadBtn" class="primary">Upload</button>
+        <small class="hint">Public uploads — everyone sees them</small>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main">
+      <header class="topbar">
+        <div class="search-wrap">
+          <input id="searchInput" placeholder="Search songs, artists, playlists..." />
+        </div>
+        <div class="user-area">
+          <div id="authUI" class="auth-ui">
+            <button id="signInBtn" class="link">Sign In</button>
+            <button id="signUpBtn" class="link">Sign Up</button>
+          </div>
+          <div id="userInfo" class="user-info hidden">
+            <img id="userAvatarSmall" src="" alt="avatar" class="avatar tiny" />
+            <span id="usernameDisplay"></span>
+            <button id="signOutBtn" class="link">Sign Out</button>
+          </div>
+        </div>
+      </header>
+
+      <section id="viewHome" class="view view-active">
+        <h2>Discover</h2>
+        <div id="songsGrid" class="grid"></div>
+      </section>
+
+      <section id="viewSearch" class="view">
+        <h2>Search</h2>
+        <div id="searchResults" class="grid"></div>
+      </section>
+
+      <section id="viewLibrary" class="view">
+        <h2>Your Library</h2>
+        <div id="yourUploads" class="grid"></div>
+      </section>
+
+      <section id="viewPlaylists" class="view">
+        <h2>Playlists</h2>
+        <div id="playlistsList" class="list"></div>
+      </section>
+    </main>
+
+    <!-- BOTTOM PLAYER -->
+    <footer id="player" class="player hidden">
+      <div class="player-left">
+        <img id="playerCover" src="" alt="cover" class="cover" />
+        <div class="track-meta">
+          <div id="playerTitle" class="title">Title</div>
+          <div id="playerArtist" class="artist">Artist</div>
+        </div>
+      </div>
+      <div class="player-center">
+        <div class="controls">
+          <button id="prevBtn" title="Previous">⏮️</button>
+          <button id="playPauseBtn" title="Play">⏯️</button>
+          <button id="nextBtn" title="Next">⏭️</button>
+        </div>
+        <div class="seek">
+          <span id="currentTime">0:00</span>
+          <input id="seekBar" type="range" min="0" max="100" value="0"/>
+          <span id="duration">0:00</span>
+        </div>
+      </div>
+      <div class="player-right">
+        <button id="addToPlaylistBtn" title="Add to playlist">➕ Playlist</button>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="1" />
+      </div>
+    </footer>
+  </div>
+
+  <!-- MODALS (Upload, Auth, Edit Profile, Add-to-Playlist, Profile Page) -->
+  <div id="modals">
+    <!-- Upload modal -->
+    <div id="uploadModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Upload a song</h3>
+        <form id="uploadForm">
+          <label>Song Title<input name="title" required /></label>
+          <label>Artist<input name="artist" required /></label>
+          <label>Album<input name="album" /></label>
+          <label>Genre<input name="genre" /></label>
+          <label>Cover Image<input type="file" name="cover" accept="image/*" required /></label>
+          <label>Audio File<input type="file" name="audio" accept="audio/*" required /></label>
+          <div class="modal-actions">
+            <button type="submit" class="primary">Upload</button>
+            <button type="button" id="cancelUpload">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign In modal -->
+    <div id="signInModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Sign In</h3>
+        <form id="signInForm">
+          <label>Username<input name="username" required /></label>
+          <label>Password<input name="password" type="password" required /></label>
+          <div class="modal-actions">
+            <button class="primary" type="submit">Sign In</button>
+            <button type="button" id="cancelSignIn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign Up modal -->
+    <div id="signUpModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Sign Up</h3>
+        <form id="signUpForm">
+          <label>Username<input name="username" required /></label>
+          <label>Email<input name="email" type="email" required /></label>
+          <label>Password<input name="password" type="password" required /></label>
+          <label>Avatar (optional)<input type="file" name="avatar" accept="image/*" /></label>
+          <div class="modal-actions">
+            <button class="primary" type="submit">Create Account</button>
+            <button type="button" id="cancelSignUp">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Profile modal -->
+    <div id="editProfileModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Edit Profile</h3>
+        <form id="editProfileForm">
+          <label>Display name<input name="displayName" /></label>
+          <label>Bio<textarea name="bio"></textarea></label>
+          <label>Avatar<input type="file" name="avatar" accept="image/*" /></label>
+          <div class="modal-actions">
+            <button class="primary" type="submit">Save</button>
+            <button type="button" id="cancelEditProfile">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add to Playlist modal -->
+    <div id="addToPlaylistModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Add to Playlist</h3>
+        <div id="userPlaylistsList" class="list"></div>
+        <div class="modal-actions">
+          <button id="createPlaylistBtn" class="primary">Create New Playlist</button>
+          <button id="closeAddToPlaylist" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create playlist modal -->
+    <div id="createPlaylistModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Create Playlist</h3>
+        <form id="createPlaylistForm">
+          <label>Name<input name="name" required /></label>
+          <label>Private <input type="checkbox" name="private" checked /> (Only you)</label>
+          <div class="modal-actions">
+            <button class="primary" type="submit">Create</button>
+            <button type="button" id="cancelCreatePlaylist">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Profile Page (full) -->
+    <div id="profileModal" class="modal hidden">
+      <div class="modal-content">
+        <button id="closeProfile" class="close">✕</button>
+        <div id="profileHeader" class="profile-header">
+          <img id="profileAvatar" class="avatar large" src="" />
+          <div>
+            <h2 id="profileDisplayName"></h2>
+            <div id="profileBadge" class="badge hidden">✅ Verified Artist</div>
+            <p id="profileBio"></p>
+            <div>
+              <span id="followersCount">0</span> followers • <span id="followingCount">0</span> following
+            </div>
+            <div class="profile-actions">
+              <button id="followBtn" class="primary">Follow</button>
+              <button id="messageBtn">Message</button>
+            </div>
+          </div>
+        </div>
+        <hr />
+        <h3>Public Songs</h3>
+        <div id="profileSongs" class="grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
